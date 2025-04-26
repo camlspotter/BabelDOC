@@ -32,6 +32,103 @@ class BatchParagraph:
         self.trackers = [page_tracker.new_paragraph() for _ in paragraphs]
 
 
+def get_head_sentence(s):
+    """Get the first full sentence."""
+    # Figure 5.1.5 contains '.' but not the end of a sentence
+    if g := re.search(r'\.(\s+|$)', s):
+        return (s[:g.end()], s[g.end():])
+    else:
+        return None
+
+def get_head_sentences(s):
+    """Get all the full sentences from the head."""
+    if g := re.search(r'^.*\.(\s+|$)', s):
+        return (g.group(0), s[len(g.group(0)):])
+    else:
+        return None
+
+def tweak_inputs(inputs):
+    """Group sentences seemingly splitted in inputs"""
+    tweaked : list[tuple[list[tuple[int,str]],str]] = []
+    buf = []
+    for id_, input_text in enumerate(inputs):
+        input = input_text[0]
+        layout_label = input_text[2].layout_label
+        match layout_label:
+            case 'plain text':
+                if buf == []:
+                    match get_head_sentences(input):
+                        case None:
+                            buf = [(id_, input)]
+                        case (s1, s2):
+                            tweaked.append(([(id_, s1)], layout_label))
+                            if s2 != "":
+                                buf = [(id_, s2)]
+                else:
+                    match get_head_sentence(input):
+                        case None:
+                            buf.append((id_, input))
+                        case (s1, s2):
+                            buf.append((id_, s1))
+                            tweaked.append((buf, layout_label))
+                            buf = []
+                            match get_head_sentences(s2):
+                                case None:
+                                    if s2 != "":
+                                        buf = [(id_, s2)]
+                                case (s21, s22):
+                                    tweaked.append(([(id_, s21)], layout_label))
+                                    if s22 != "":
+                                        buf = [(id_, s22)]
+            case _:
+                tweaked.append(([(id_, input)], layout_label))
+    if buf != []:
+        tweaked.append((buf, 'plain text'))
+    # Check the plain text contents are preserved.
+    org_contents = ''.join([input_text[0] for input_text in inputs if input_text[2].layout_label == 'plain text'])
+    tweaked_contents = ''.join([ str for (id_str_list, layout_label) in tweaked if layout_label == 'plain text'
+                                     for (_, str) in id_str_list ])
+    if org_contents != tweaked_contents:
+        logger.error(f'Bug of tweak_inputs, org_contents: {org_contents}; tweaked_contents: {tweaked_contents}')
+        logger.error(org_contents)
+        logger.error(tweaked_contents)
+        assert False
+    return tweaked
+
+def untweak_translation(
+    tweaked : list[tuple[list[tuple[int,str]],str]], 
+    translation_results : dict[int,str]
+) -> dict[int,str]:
+    """Apportion the translation into the original shape of input blocks"""
+    translation_results2 : dict[int,str] = {}
+    def add_translation(id, s):
+        if id in translation_results2:
+            translation_results2[id] += ' ' + s
+        else:
+            translation_results2[id] = s
+    # xxx recover if lengths are different
+
+    for (id_, (xs, _layout_label)) in enumerate(tweaked):
+        translation = translation_results.get(id_, '')
+        total_len = sum([len(s) for (_, s) in xs])
+        translation_len = len(translation)
+        if total_len == 0:
+            # Weird...
+            add_translation(xs[0][0], translation)
+        else:
+            for (pos, (id, s)) in enumerate(xs):
+                if pos == len(xs) - 1:
+                    l = len(translation)
+                else:
+                    l = int(translation_len * len(s) / total_len)
+                if l == 0:
+                    # Weird...
+                    pass
+                else:
+                    add_translation(id, translation[:l])
+                    translation = translation[l:]
+    return translation_results2
+
 class ILTranslatorLLMOnly:
     stage_name = "Translate Paragraphs"
 
@@ -230,14 +327,25 @@ class ILTranslatorLLMOnly:
                 return
             json_format_input = []
 
-            for id_, input_text in enumerate(inputs):
-                json_format_input.append(
-                    {
-                        "id": id_,
-                        "input": input_text[0],
-                        "layout_label": input_text[2].layout_label,
-                    }
-                )
+            tweaked = []
+            try:
+                tweaked = tweak_inputs(inputs)
+            except Exception as e:
+                import traceback
+                traceback.print_exception(e)
+                logger.error(e)
+                raise e
+            
+            for id_, input in enumerate(tweaked):
+                 input_str = ' '.join([s for (_,s) in input[0]])
+                 json_format_input.append(
+                     {
+                         "id": id_,
+                         "input": input_str,
+                         "layout_label": input[1]
+                     }
+                 )
+
             json_format_input = json.dumps(
                 json_format_input, ensure_ascii=False, indent=2
             )
@@ -297,7 +405,7 @@ class ILTranslatorLLMOnly:
 
             final_input = "\n".join(llm_input).strip()
 
-            logger.warning(final_input)
+            # logger.warning(final_input)
 
             llm_output = self.translate_engine.llm_translate(
                 final_input,
@@ -307,12 +415,19 @@ class ILTranslatorLLMOnly:
 
             llm_output = self._clean_json_output(llm_output)
 
-            logger.warning('OUTPUT')
-            logger.warning(llm_output)
-
             parsed_output = json.loads(llm_output)
 
             translation_results = {item["id"]: item["output"] for item in parsed_output}
+
+            logger.warning('RAW OUTPUT')
+            logger.warning(translation_results)
+
+            try:
+                translation_results = untweak_translation(tweaked, translation_results)
+            except Exception as e:
+                import traceback
+                traceback.print_exception(e)
+                logger.error(e)
 
             if len(translation_results) != len(inputs):
                 raise Exception(
