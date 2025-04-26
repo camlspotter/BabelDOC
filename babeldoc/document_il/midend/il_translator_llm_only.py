@@ -296,6 +296,9 @@ class ILTranslatorLLMOnly:
             llm_input.append(prompt_template)
 
             final_input = "\n".join(llm_input).strip()
+
+            logger.warning(final_input)
+
             llm_output = self.translate_engine.llm_translate(
                 final_input,
                 rate_limit_params={"paragraph_token_count": paragraph_token_count},
@@ -303,6 +306,9 @@ class ILTranslatorLLMOnly:
             llm_output = llm_output.strip()
 
             llm_output = self._clean_json_output(llm_output)
+
+            logger.warning('OUTPUT')
+            logger.warning(llm_output)
 
             parsed_output = json.loads(llm_output)
 
