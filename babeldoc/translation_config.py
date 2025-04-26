@@ -39,6 +39,7 @@ class TranslationConfig:
         lang_in: str,
         lang_out: str,
         doc_layout_model: DocLayoutModel,
+        force_serif: bool | None,  # Workaround for PyMuPDF which returns wrong serif information.
         # for backward compatibility
         font: str | Path | None = None,
         pages: str | None = None,
@@ -70,6 +71,7 @@ class TranslationConfig:
         skip_scanned_detection: bool = False,
         ocr_workaround: bool = False,
     ):
+        self.force_serif = force_serif
         self.translator = translator
 
         self.input_file = input_file
