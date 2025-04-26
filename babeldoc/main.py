@@ -216,6 +216,21 @@ def create_parser():
         default=False,
         help="Add text fill background (experimental)",
     )
+    import argparse
+    def font_type_to_bool(v : str) -> bool | None:
+        if v == 'sans-serif':
+            return False
+        elif v == 'serif':
+            return True
+        else:
+            raise argparse.ArgumentTypeError(f'--force-serif only takes sans-serif or serif')
+    translation_group.add_argument(
+        "--force-font",
+        type=font_type_to_bool,
+        default=None,
+        metavar='FONT-TYPE',
+        help="Force serif/sans-serif fonts",
+    )
     # service option argument group
     service_group = translation_group.add_mutually_exclusive_group()
     service_group.add_argument(
@@ -384,8 +399,8 @@ async def main():
             show_char_box=args.show_char_box,
             skip_scanned_detection=args.skip_scanned_detection,
             ocr_workaround=args.ocr_workaround,
+            force_serif=args.force_font,
         )
-
         # Create progress handler
         progress_context, progress_handler = create_progress_handler(config)
 

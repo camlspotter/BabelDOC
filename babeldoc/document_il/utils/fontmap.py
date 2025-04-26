@@ -141,6 +141,10 @@ class FontMapper:
             )
             return None
 
+        # Workaround for PyMuPDF which returns wrong serif information
+        if self.translation_config.force_serif is not None:
+            serif = self.translation_config.force_serif
+
         script_font_map_result = self.map_in_type(
             bold, italic, monospaced, serif, char_unicode, "script"
         )
@@ -252,7 +256,6 @@ class FontMapper:
                 descent_fontmap = mupdf_font.descent_fontmap
                 ascent_fontmap = mupdf_font.ascent_fontmap
                 encoding_length = mupdf_font.encoding_length
-
                 pdf_fonts.append(
                     il_version_1.PdfFont(
                         name=font_name,
