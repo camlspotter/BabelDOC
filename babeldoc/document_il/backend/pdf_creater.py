@@ -167,7 +167,9 @@ def _subset_fonts_process(pdf_path, output_path):
     """
     try:
         pdf = pymupdf.open(pdf_path)
-        pdf.subset_fonts(fallback=False)
+        # xxx Buggy. Some glyphs are lost though they are used!
+        # pdf.subset_fonts(fallback=False)
+        pdf.subset_fonts(verbose=True, fallback=True)
         pdf.save(output_path)
         # 返回 0 表示成功
         os._exit(0)
