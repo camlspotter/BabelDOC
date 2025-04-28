@@ -40,6 +40,63 @@ TABLE_DETECTION_RAPIDOCR_MODEL_URL = {
 
 # from https://github.com/funstory-ai/BabelDOC-Assets/blob/main/font_metadata.json
 EMBEDDING_FONT_METADATA = {
+    "BIZUDGothic-Regular.ttf": {
+        "ascent": 1802,
+        "bold": 0,
+        "descent": -246,
+        "encoding_length": 2,
+        "file_name": "BIZUDGothic-Regular.ttf",
+        "font_name": "BIZ UD Gothic Regular",
+        "italic": 0,
+        "monospace": 0,
+        "serif": 0,
+        "sha3_256": "09d76ff9d0620586f58d5bc5af46de3c758d11bcfcfbcecebf8452b1f4174699",
+        "size": 4486740,
+    },
+
+    "BIZUDGothic-Bold.ttf": {
+        "ascent": 1802,
+        "bold": 1,
+        "descent": -246,
+        "encoding_length": 2,
+        "file_name": "BIZUDGothic-Bold.ttf",
+        "font_name": "BIZ UD Gothic Bold",
+        "italic": 0,
+        "monospace": 0,
+        "serif": 0,
+        "sha3_256": "5a27ec08e3e0ed7c4544b964a2b471c25ed4b76e732c2870e725de650ada4442",
+        "size": 4457640,
+    },
+
+    "BIZUDMincho-Regular.ttf": {
+        "ascent": 1802,
+        "bold": 0,
+        "descent": -246,
+        "encoding_length": 2,
+        "file_name": "BIZUDMincho-Regular.ttf",
+        "font_name": "BIZ UD Mincho Regular",
+        "italic": 0,
+        "monospace": 0,
+        "serif": 1,
+        "sha3_256": "ff0ee6ee33fdc07aeaf65e2515552b03191108a355c83608134e5a5a76e4bf71",
+        "size": 5891380,
+    },
+
+    "BIZUDMincho-Bold.ttf": {
+        "ascent": 1802,
+        "bold": 1,
+        "descent": -246,
+        "encoding_length": 2,
+        "file_name": "BIZUDMincho-Bold.ttf",
+        "font_name": "BIZ UD Mincho Bold",
+        "italic": 0,
+        "monospace": 0,
+        "serif": 0,
+        "sha3_256": "d8f0bd381b72a390a4a3f09d888f1fe098ff55c08ad34a14a7e6fd9f4779afb5",
+        "size": 6789924,
+    },
+
+    # mincho regular 1802, -246
     "GoNotoKurrent-Bold.ttf": {
         "ascent": 1069,
         "bold": 1,
@@ -567,16 +624,20 @@ KR_FONT_FAMILY = {
 JP_FONT_FAMILY = {
     "script": ["KleeOne-Regular.ttf"],
     "normal": [
-        "SourceHanSerifJP-Bold.ttf",
-        "SourceHanSerifJP-Regular.ttf",
-        "SourceHanSansJP-Bold.ttf",
-        "SourceHanSansJP-Regular.ttf",
+        # Latin, digits, etc are proportional
+        "NotoSans-Regular.ttf",
+        "NotoSans-Bold.ttf",
+        # CJKs are monospace
+        "BIZUDGothic-Regular.ttf",
+        "BIZUDGothic-Bold.ttf",
+        "BIZUDMincho-Regular.ttf",
+        "BIZUDMincho-Bold.ttf",
     ],
     "fallback": [
         "GoNotoKurrent-Regular.ttf",
         "GoNotoKurrent-Bold.ttf",
     ],
-    "base": ["SourceHanSansCN-Regular.ttf"],
+    "base": ["BIZUDGothic-Regular.ttf"],
 }
 
 EN_FONT_FAMILY = {
