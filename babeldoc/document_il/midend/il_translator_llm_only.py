@@ -462,7 +462,7 @@ class ILTranslatorLLMOnly:
 
                     if not (0.3 < output_token_count / input_token_count < 3):
                         logger.warning(
-                            f"Translation result is too long or too short. Input: {input_token_count}, Output: {output_token_count}"
+                            f"Translation result is too long or too short. Input: {input_token_count} for '{input_unicode}', Output: {output_token_count} for '{output_unicode}'"
                         )
                         continue
 
