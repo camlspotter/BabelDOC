@@ -373,10 +373,13 @@ class ILTranslatorLLMOnly:
     {json_format_input}
     ```
     
-    For each entry in the JSON, translate the contents of the "input" field into {self.translation_config.lang_out}.
-    Write the translation back into the "output" field for that entry.
+    各 JSON エントリに対して、 "input" フィールドの英文を日本語に翻訳してください。
+    - layout_label が "plain text" である場合は、常体(だ、である)を使った日本語にしてください。敬体(です、ます)を使ってはいけません。
+    - layout_label が "plain text" ではない名詞句は名詞句として翻訳してください。
+    翻訳結果は "output" フィールドに入れ、 "id" フィールドとのレコードを作ってください。
     
     """
+
                 + """
     Here is an example of the expected format:
     
@@ -385,7 +388,7 @@ class ILTranslatorLLMOnly:
     Input:
     {
         "id": 1,
-        "input": "Source",
+        "input": "It was sunny yesterday.",
         "layout_label": "plain text"
     }
     ```
@@ -393,7 +396,7 @@ class ILTranslatorLLMOnly:
     ```json
     {
         "id": 1,
-        "output": "Translation"
+        "output": "昨日は晴れだった。"
     }
     ```
     </example>
@@ -405,22 +408,24 @@ class ILTranslatorLLMOnly:
 
             final_input = "\n".join(llm_input).strip()
 
-            # logger.warning(final_input)
-
             llm_output = self.translate_engine.llm_translate(
                 final_input,
                 rate_limit_params={"paragraph_token_count": paragraph_token_count},
             )
             llm_output = llm_output.strip()
 
+            with open('llm_input_output.log', 'a', encoding='utf-8') as oc:
+                oc.write('INPUT+OUTPUT\n')
+                oc.write(final_input)
+                oc.write('\n')
+                oc.write(llm_output)
+                oc.write('\n\n')
+
             llm_output = self._clean_json_output(llm_output)
 
             parsed_output = json.loads(llm_output)
 
             translation_results = {item["id"]: item["output"] for item in parsed_output}
-
-            logger.warning('RAW OUTPUT')
-            logger.warning(translation_results)
 
             try:
                 translation_results = untweak_translation(tweaked, translation_results)
