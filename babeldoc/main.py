@@ -231,6 +231,13 @@ def create_parser():
         metavar='FONT-TYPE',
         help="Force serif/sans-serif fonts",
     )
+    translation_group.add_argument(
+        "--additional-prompt",
+        type=str,
+        default=None,
+        metavar='PROMPT',
+        help="Additional prompt for LLM. Requires --ignore-cache if you change this option.",
+    )
     # service option argument group
     service_group = translation_group.add_mutually_exclusive_group()
     service_group.add_argument(
@@ -400,6 +407,7 @@ async def main():
             skip_scanned_detection=args.skip_scanned_detection,
             ocr_workaround=args.ocr_workaround,
             force_serif=args.force_font,
+            additional_prompt=args.additional_prompt,
         )
 
         # Create progress handler

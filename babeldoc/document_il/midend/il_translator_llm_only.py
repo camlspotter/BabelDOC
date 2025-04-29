@@ -365,6 +365,10 @@ class ILTranslatorLLMOnly:
                     f"The most similar title in the full text: {local_title_paragraph.unicode}"
                 )
             # Create a structured prompt template for LLM translation
+            additional_prompt = ""
+            if self.translation_config.additional_prompt:
+                additional_prompt = self.translation_config.additional_prompt + "\n\n"
+
             prompt_template = (
                 f"""
     You will be given a JSON formatted input containing entries with "id" and "input" fields. Here is the input:
