@@ -13,17 +13,11 @@ TIKTOKEN_CACHES = {
 }
 
 FONT_METADATA_URL = {
-    "github": "https://raw.githubusercontent.com/funstory-ai/BabelDOC-Assets/refs/heads/main/font_metadata.json",
-    "huggingface": "https://huggingface.co/datasets/awwaawwa/BabelDOC-Assets/resolve/main/font_metadata.json?download=true",
-    "hf-mirror": "https://hf-mirror.com/datasets/awwaawwa/BabelDOC-Assets/resolve/main/font_metadata.json?download=true",
-    "modelscope": "https://www.modelscope.cn/datasets/awwaawwa/BabelDOCAssets/resolve/master/font_metadata.json",
+    "github": "https://raw.githubusercontent.com/camlspotter/BabelDOC-Assets/refs/heads/main/font_metadata.json",
 }
 
 FONT_URL_BY_UPSTREAM = {
-    "github": lambda name: f"https://raw.githubusercontent.com/funstory-ai/BabelDOC-Assets/refs/heads/main/fonts/{name}",
-    "huggingface": lambda name: f"https://huggingface.co/datasets/awwaawwa/BabelDOC-Assets/resolve/main/fonts/{name}?download=true",
-    "hf-mirror": lambda name: f"https://hf-mirror.com/datasets/awwaawwa/BabelDOC-Assets/resolve/main/fonts/{name}?download=true",
-    "modelscope": lambda name: f"https://www.modelscope.cn/datasets/awwaawwa/BabelDOCAssets/resolve/master/fonts/{name}",
+    "github": lambda name: f"https://raw.githubusercontent.com/camlspotter/BabelDOC-Assets/refs/heads/main/fonts/{name}",
 }
 
 DOC_LAYOUT_ONNX_MODEL_URL = {

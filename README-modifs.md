@@ -18,14 +18,12 @@ LLM prompt tweaks for Japanese translation
 
 ### Fixes around Japanese font handling
 
-BIZ UD fonts for Japanese rendering. You need to get the following fonts and put them under `$HOME/.cache/babeldoc/fonts`:
+BIZ UD fonts for Japanese rendering:
 
 - BIZUDGothic-Regular.ttf
 - BIZUDGothic-Bold.ttf
 - BIZUDMincho-Regular.ttf
 - BIZUDMincho-Bold.ttf
-
-So far you have to download them by hand.
 
 For non CJK fonts, the following fonts are used: 
 
@@ -37,4 +35,3 @@ They are automatically downloaded.
 ## Font subsetting workaround
 
 It seems PyMuPDF's font subsetting has a bug and some glyphs are lost during the subsetting.  A patch is introduced to fallback to a safer algorithm using `fonttools`.
-
