@@ -112,11 +112,13 @@ class FontMapper:
                 continue
             if bool(bold) != bool(font.is_bold):
                 continue
-            # 不知道什么原因，思源黑体的 serif 属性为 1，先 workaround
-            if bool(serif) and "serif" not in font.font_id.lower():
+            if bool(serif) != bool(font.is_serif):
                 continue
-            if not bool(serif) and "serif" in font.font_id.lower():
-                continue
+            # # 不知道什么原因，思源黑体的 serif 属性为 1，先 workaround
+            # if bool(serif) and "serif" not in font.font_id.lower():
+            #     continue
+            # if not bool(serif) and "serif" in font.font_id.lower():
+            #     continue
             return font
 
         return None
