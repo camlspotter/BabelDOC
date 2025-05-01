@@ -563,12 +563,13 @@ class Typesetting:
             fonts[xobj.xobj_id] = page_fonts.copy()
             for font in xobj.pdf_font:
                 fonts[xobj.xobj_id][font.font_id] = font
-        if (
-            page.page_number == 0
-            and self.translation_config.watermark_output_mode
-            == WatermarkOutputMode.Watermarked
-        ):
-            self.add_watermark(page)
+        # No watermark anyway
+        # if (
+        #     page.page_number == 0
+        #     and self.translation_config.watermark_output_mode
+        #     == WatermarkOutputMode.Watermarked
+        # ):
+        #     self.add_watermark(page)
         # 开始实际的渲染过程
         for paragraph in page.pdf_paragraph:
             self.render_paragraph(paragraph, page, fonts)
