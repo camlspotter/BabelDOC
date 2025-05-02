@@ -45,6 +45,9 @@ dependencies = [
     "rapidocr-onnxruntime>=1.4.4",
     "zstd>=1.5.6.7",
     "fonttools>=4.57.0",
+    "gradio-pdf>=0.0.22",
+    "gradio>=5.28.0",
+    "python-dotenv>=1.1.0",
 ]
 
 [project.optional-dependencies]
