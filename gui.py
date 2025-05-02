@@ -212,11 +212,11 @@ with gr.Blocks() as demo:
 def main():
     # Queue() for parallel processing
     demo.queue(
-        # default_concurrency_limit=6
+        default_concurrency_limit=6
     ).launch(
         # max_file_size= '20mb',
         server_name= '0.0.0.0',
-        # server_port= 5005,
+        server_port= 5006,
         # favicon_path= icon.roischat16,
         # root_path='/rois_llm'
     )
