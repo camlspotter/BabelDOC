@@ -232,11 +232,16 @@ def create_parser():
         help="Force serif/sans-serif fonts",
     )
     translation_group.add_argument(
-        "--additional-prompt",
+        "--translation-prompt",
         type=str,
         default=None,
         metavar='PROMPT',
-        help="Additional prompt for LLM. Requires --ignore-cache if you change this option.",
+        help="Translation prompt for LLM. Ex. 'Translate English to very polite Japanese.'",
+    )
+    translation_group.add_argument(
+        "--connect-columns",
+        action='store_true',
+        help="Try to connect sentences split by multi-columns (experimental)",
     )
     # service option argument group
     service_group = translation_group.add_mutually_exclusive_group()
@@ -407,7 +412,8 @@ async def main():
             skip_scanned_detection=args.skip_scanned_detection,
             ocr_workaround=args.ocr_workaround,
             force_serif=args.force_font,
-            additional_prompt=args.additional_prompt,
+            translation_prompt=args.translation_prompt,
+            connect_columns=args.connect_columns,
         )
 
         # Create progress handler

@@ -95,6 +95,9 @@ def tweak_inputs(inputs):
         assert False
     return tweaked
 
+def no_tweak_inputs(inputs):
+    return [ [[(id_,input_text)], input_text] for (id_, input_text) in enumerate(inputs) ]
+
 def untweak_translation(
     tweaked : list[tuple[list[tuple[int,str]],str]], 
     translation_results : dict[int,str]
@@ -328,13 +331,17 @@ class ILTranslatorLLMOnly:
             json_format_input = []
 
             tweaked = []
-            try:
-                tweaked = tweak_inputs(inputs)
-            except Exception as e:
-                import traceback
-                traceback.print_exception(e)
-                logger.error(e)
-                raise e
+            if self.translation_config.connect_columns:
+                print('CONNECT COLUMNS!')
+                try:
+                    tweaked = tweak_inputs(inputs)
+                except Exception as e:
+                    import traceback
+                    traceback.print_exception(e)
+                    logger.error(e)
+                    raise e
+            else:
+                tweaked = no_tweak_inputs(inputs)
             
             for id_, input in enumerate(tweaked):
                  input_str = ' '.join([s for (_,s) in input[0]])
@@ -365,9 +372,11 @@ class ILTranslatorLLMOnly:
                     f"The most similar title in the full text: {local_title_paragraph.unicode}"
                 )
             # Create a structured prompt template for LLM translation
-            additional_prompt = ""
-            if self.translation_config.additional_prompt:
-                additional_prompt = self.translation_config.additional_prompt + "\n\n"
+            translation_prompt = ""
+            if self.translation_config.translation_prompt:
+                translation_prompt = self.translation_config.translation_prompt
+            else:
+                translation_prompt = 'Translate texts in {self.translation_config.lang_in} into {self.translation_config.lang_out}.'
 
             prompt_template = (
                 f"""
@@ -377,8 +386,9 @@ class ILTranslatorLLMOnly:
     {json_format_input}
     ```
     
-    各 JSON エントリに対して、 "input" フィールドの英文を日本語に翻訳してください。
-    - layout_label が "plain text" である場合は、常体(だ、である)を使った日本語にしてください。敬体(です、ます)を使ってはいけません。
+    {translation_prompt}
+
+    各 JSON エントリに対して、 "input" フィールドのテキストを翻訳してください。
     - layout_label が "plain text" ではない名詞句は名詞句として翻訳してください。
     翻訳結果は "output" フィールドに入れ、 "id" フィールドとのレコードを作ってください。
     
