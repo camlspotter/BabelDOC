@@ -210,13 +210,18 @@ with gr.Blocks() as demo:
     )
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--server-port', type= int, default= None)
+    ns = parser.parse_args()
+
     # Queue() for parallel processing
     demo.queue(
         default_concurrency_limit=6
     ).launch(
         # max_file_size= '20mb',
         server_name= '0.0.0.0',
-        server_port= 5006,
+        server_port= ns.server_port,
         # favicon_path= icon.roischat16,
         # root_path='/rois_llm'
     )
