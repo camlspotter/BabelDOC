@@ -137,7 +137,7 @@ with gr.Blocks() as demo:
     file.change(lambda x:x, [file], [pdf])
 
     def update_spec(lang_in, lang_out, details):
-        return spec_str(lang_in,lang_out,details)
+        return '指示: ' + spec_str(lang_in,lang_out,details)
 
     gr.on(
         [lang_in.change, lang_out.change, details.change],
