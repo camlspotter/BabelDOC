@@ -346,11 +346,12 @@ class ILTranslatorLLMOnly:
             
             for id_, input in enumerate(tweaked):
                  input_str = ' '.join([s for (_,s) in input[0]])
+                 # xxx layout_label sometimes affects the translation.
                  json_format_input.append(
                      {
                          "id": id_,
                          "input": input_str,
-                         "layout_label": input[1]
+                         # "layout_label": input[1]
                      }
                  )
 
@@ -404,14 +405,13 @@ class ILTranslatorLLMOnly:
     {
         "id": 1,
         "input": "It was sunny yesterday.",
-        "layout_label": "plain text"
     }
     ```
     Output:
     ```json
     {
         "id": 1,
-        "output": "昨日は晴れだった。"
+        "output": "translation"
     }
     ```
     </example>
