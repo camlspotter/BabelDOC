@@ -32,7 +32,7 @@ class BatchParagraph:
         self.trackers = [page_tracker.new_paragraph() for _ in paragraphs]
 
 
-def get_head_sentence(s):
+def get_head_sentence(s : str) -> tuple[str,str] | None:
     """Get the first full sentence."""
     # Figure 5.1.5 contains '.' but not the end of a sentence
     if g := re.search(r'\.(\s+|$)', s):
@@ -40,16 +40,16 @@ def get_head_sentence(s):
     else:
         return None
 
-def get_head_sentences(s):
+def get_head_sentences(s : str) -> tuple[str,str] | None:
     """Get all the full sentences from the head."""
     if g := re.search(r'^.*\.(\s+|$)', s):
         return (g.group(0), s[len(g.group(0)):])
     else:
         return None
 
-def tweak_inputs(inputs):
+def tweak_inputs(inputs : list[tuple[str, ILTranslator.TranslateInput, PdfParagraph, PageTranslateTracker]]):
     """Group sentences seemingly splitted in inputs"""
-    tweaked : list[tuple[list[tuple[int,str]],str]] = []
+    tweaked : list[tuple[list[tuple[int,str]],str | None]] = []
     buf = []
     for id_, input_text in enumerate(inputs):
         input = input_text[0]
@@ -95,8 +95,10 @@ def tweak_inputs(inputs):
         assert False
     return tweaked
 
-def no_tweak_inputs(inputs):
-    return [ [[(id_,input_text)], input_text] for (id_, input_text) in enumerate(inputs) ]
+def no_tweak_inputs(
+    inputs : list[tuple[str, ILTranslator.TranslateInput, PdfParagraph, PageTranslateTracker]]
+) -> list[tuple[list[tuple[int,str]],str | None]]:
+    return [ ([(id_,input_text[0])], input_text[0]) for (id_, input_text) in enumerate(inputs) ]
 
 def untweak_translation(
     tweaked : list[tuple[list[tuple[int,str]],str]], 
@@ -313,10 +315,10 @@ class ILTranslatorLLMOnly:
         self.translation_config.raise_if_cancelled()
         should_translate_paragraph = []
         try:
-            inputs = []
+            inputs : list[tuple[str, ILTranslator.TranslateInput, PdfParagraph, PageTranslateTracker]] = []
 
             for i in range(len(batch_paragraph.paragraphs)):
-                paragraph = batch_paragraph.paragraphs[i]
+                paragraph : PdfParagraph = batch_paragraph.paragraphs[i]
                 tracker = batch_paragraph.trackers[i]
                 text, translate_input = self.il_translator.pre_translate_paragraph(
                     paragraph, tracker, page_font_map, xobj_font_map
