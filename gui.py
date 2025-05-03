@@ -10,6 +10,7 @@ from babeldoc.translation_config import TranslationConfig, TranslateResult
 from babeldoc.document_il.translator.translator import OpenAITranslator
 from babeldoc.docvision.doclayout import DocLayoutModel
 from babeldoc.translation_config import WatermarkOutputMode
+from babeldoc.docvision.table_detection.rapidocr import RapidOCRModel
 import os
 
 from typing import Literal, get_args
@@ -27,10 +28,10 @@ def lang_id(lang : Lang) -> str:
 Font = Literal['なし', 'serif/明朝', 'sans-serif/ゴシック']
 fonts = list(get_args(Font))
 
-ConnectColumns = Literal['しない', 'する']
-connect_columns = list(get_args(ConnectColumns))
+DoNotOrDo = Literal['しない', 'する']
+do_not_or_dos = list(get_args(DoNotOrDo))
 
-def connect_columns_value(s : ConnectColumns) -> bool:
+def do_not_or_do_value(s : DoNotOrDo) -> bool:
     match s:
         case 'しない':
             return False
@@ -52,7 +53,8 @@ def build_config(
     input_file : str,
     translation_prompt : str,
     font : Font,
-    connect_columns : ConnectColumns,
+    connect_columns : DoNotOrDo,
+    translate_table_text : DoNotOrDo,
 ) -> TranslationConfig:
     translator = OpenAITranslator(
         lang_in = lang_id(lang_in),
@@ -72,7 +74,8 @@ def build_config(
         output_dir = None,
         working_dir = None,
         translation_prompt = translation_prompt,
-        connect_columns = connect_columns_value(connect_columns),
+        connect_columns = do_not_or_do_value(connect_columns),
+        table_model= do_not_or_do_value(translate_table_text),
     #         pages: str | None = None,
     #         progress_monitor: ProgressMonitor | None = None,
     #         skip_clean: bool = False,
@@ -84,7 +87,6 @@ def build_config(
     #         use_alternating_pages_dual: bool = False,
     #         # Add split-related parameters
     #         split_strategy: BaseSplitStrategy | None = None,
-    #         table_model=None,
     #         show_char_box: bool = False,
     #         skip_scanned_detection: bool = False,
     #         ocr_workaround: bool = False,
@@ -119,11 +121,15 @@ with gr.Blocks() as demo:
                 label='フォント強制',
                 value= fonts[0],
             )
+            translate_table_text = gr.Radio(
+                do_not_or_dos,
+                label='表内テキスト翻訳(実験中)',
+                value=do_not_or_dos[0],
+            )
             connect_columns = gr.Radio(
-                connect_columns,
+                do_not_or_dos,
                 label='コラム結合(実験中)',
-                value=connect_columns[0],
-                
+                value=do_not_or_dos[0],
             )
             but = gr.Button('翻訳', interactive=False)
             outputs = gr.Files(label='翻訳結果', visible=False)
@@ -153,6 +159,7 @@ with gr.Blocks() as demo:
         details,
         font,
         connect_columns,
+        translate_table_text,
         progress= gr.Progress()
     ):
         config = build_config(
@@ -162,6 +169,7 @@ with gr.Blocks() as demo:
             translation_prompt= spec_str(lang_in, lang_out, details),
             font= font,
             connect_columns = connect_columns,
+            translate_table_text = translate_table_text == 'する',
         )
         progress(0.0, desc= 'Translating')
         async for event in async_translate(config):
@@ -204,7 +212,8 @@ with gr.Blocks() as demo:
             lang_out, 
             details,
             font, 
-            connect_columns
+            connect_columns,
+            translate_table_text,
         ],
         [pdf, but, outputs]
     )
