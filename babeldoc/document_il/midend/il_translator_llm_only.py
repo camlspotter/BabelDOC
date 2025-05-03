@@ -334,7 +334,6 @@ class ILTranslatorLLMOnly:
 
             tweaked = []
             if self.translation_config.connect_columns:
-                print('CONNECT COLUMNS!')
                 try:
                     tweaked = tweak_inputs(inputs)
                 except Exception as e:
