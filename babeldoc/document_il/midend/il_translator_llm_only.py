@@ -376,9 +376,9 @@ class ILTranslatorLLMOnly:
             # Create a structured prompt template for LLM translation
             translation_prompt = ""
             if self.translation_config.translation_prompt:
-                translation_prompt = self.translation_config.translation_prompt
+                translation_prompt = f'各 JSON エントリに対して、 "input" フィールドのテキストの{self.translation_config.translation_prompt}'
             else:
-                translation_prompt = 'Translate texts in {self.translation_config.lang_in} into {self.translation_config.lang_out}.'
+                translation_prompt = f'各 JSON エントリに対して、 "input" フィールドのテキストの{self.translation_config.lang_in}を{self.translation_config.lang_out}に翻訳してください。'
 
             prompt_template = (
                 f"""
@@ -388,10 +388,8 @@ class ILTranslatorLLMOnly:
     {json_format_input}
     ```
     
-    {translation_prompt}
+    各 JSON エントリに対して、 "input" フィールドのテキストの{translation_prompt}
 
-    各 JSON エントリに対して、 "input" フィールドのテキストを翻訳してください。
-    - layout_label が "plain text" ではない名詞句は名詞句として翻訳してください。
     翻訳結果は "output" フィールドに入れ、 "id" フィールドとのレコードを作ってください。
     
     """
