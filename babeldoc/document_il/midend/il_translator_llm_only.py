@@ -536,8 +536,11 @@ class ILTranslatorLLMOnly:
                             paragraph_token_count=paragraph_token_count,
                         )
 
+
         except Exception as e:
+            logger.exception(e)
             logger.warning(f"Error {e} during translation. try fallback")
+
             if not should_translate_paragraph:
                 should_translate_paragraph = list(
                     range(len(batch_paragraph.paragraphs))
