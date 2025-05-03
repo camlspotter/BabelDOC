@@ -436,9 +436,22 @@ class ILTranslatorLLMOnly:
 
             llm_output = self._clean_json_output(llm_output)
 
-            parsed_output = json.loads(llm_output)
+            parsed_output_ = json.loads(llm_output)
 
-            translation_results = {item["id"]: item["output"] for item in parsed_output}
+            parsed_output : list[dict[str,int|str]]
+
+            # parsed_output is often a dict, but we expect a list of dict
+            if isinstance(parsed_output_, dict):
+                parsed_output = [parsed_output_]
+            else:
+                parsed_output = parsed_output_
+
+            try:
+                translation_results = {item["id"]: item["output"] for item in parsed_output}
+            except Exception as e:
+                logger.exception(e)
+                logger.error(f'parsed_output: {parsed_output}')
+                raise e
 
             try:
                 translation_results = untweak_translation(tweaked, translation_results)
