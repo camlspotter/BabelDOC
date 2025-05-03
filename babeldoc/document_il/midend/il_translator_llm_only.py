@@ -116,6 +116,7 @@ def untweak_translation(
     for (id_, (xs, _layout_label)) in enumerate(tweaked):
         translation = translation_results.get(id_, '')
         total_len = sum([len(s) for (_, s) in xs])
+        logger.info(('Translation', [s for (_, s) in xs], translation))
         translation_len = len(translation)
         if total_len == 0:
             # Weird...
