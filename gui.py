@@ -77,7 +77,7 @@ def build_config(
         working_dir = None,
         connect_columns = do_not_or_do_value(connect_columns),
         table_model= RapidOCRModel() if do_not_or_do_value(translate_table_text) else None,
-        min_text_length = 1 if lang_id(lang_in) == 'jp' else 5:
+        min_text_length = 1 if lang_id(lang_in) == 'jp' else 5,
     #         pages: str | None = None,
     #         progress_monitor: ProgressMonitor | None = None,
     #         skip_clean: bool = False,
