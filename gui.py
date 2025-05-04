@@ -50,8 +50,8 @@ def force_serif_value(f : Font) -> bool | None:
 def build_config(
     lang_in : Lang,
     lang_out : Lang,
+    details : str,
     input_file : str,
-    translation_prompt : str,
     font : Font,
     connect_columns : DoNotOrDo,
     translate_table_text : DoNotOrDo,
@@ -68,14 +68,16 @@ def build_config(
         input_file,
         lang_in= lang_id(lang_in),
         lang_out= lang_id(lang_out),
+        lang_in_nl= lang_in,
+        lang_out_nl= details + lang_out,
         doc_layout_model= DocLayoutModel.load_onnx(),
         force_serif= force_serif_value(font),
         watermark_output_mode= WatermarkOutputMode.Watermarked,
         output_dir = None,
         working_dir = None,
-        translation_prompt = translation_prompt,
         connect_columns = do_not_or_do_value(connect_columns),
-        table_model= do_not_or_do_value(translate_table_text),
+        table_model= RapidOCRModel() if do_not_or_do_value(translate_table_text) else None,
+        min_text_length = 1 if lang_id(lang_in) == 'jp' else 5:
     #         pages: str | None = None,
     #         progress_monitor: ProgressMonitor | None = None,
     #         skip_clean: bool = False,
@@ -83,7 +85,6 @@ def build_config(
     #         disable_rich_text_translate: bool = False,
     #         enhance_compatibility: bool = False,
     #         report_interval: float = 0.1,
-    #         min_text_length: int = 5,
     #         use_alternating_pages_dual: bool = False,
     #         # Add split-related parameters
     #         split_strategy: BaseSplitStrategy | None = None,
@@ -166,10 +167,10 @@ with gr.Blocks() as demo:
             input_file= file,
             lang_in= lang_in,
             lang_out= lang_out,
-            translation_prompt= spec_str(lang_in, lang_out, details) + f'{lang_out}は{lang_out}のままにしてください。',
+            details= details,
             font= font,
             connect_columns = connect_columns,
-            translate_table_text = translate_table_text == 'する',
+            translate_table_text = translate_table_text,
         )
         progress(0.0, desc= 'Translating')
         async for event in async_translate(config):
