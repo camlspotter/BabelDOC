@@ -93,7 +93,7 @@ def build_config(
     )
 
 def spec_str(lang_in : Lang, lang_out : Lang, detail : str) -> str:
-    return f'{lang_in}を{detail}{lang_out}に翻訳してください'
+    return f'{lang_in}を{detail}{lang_out}に翻訳してください。'
 
 with gr.Blocks() as demo:
     with gr.Row():
@@ -166,7 +166,7 @@ with gr.Blocks() as demo:
             input_file= file,
             lang_in= lang_in,
             lang_out= lang_out,
-            translation_prompt= spec_str(lang_in, lang_out, details),
+            translation_prompt= spec_str(lang_in, lang_out, details) + f'{lang_out}は{lang_out}のままにしてください。',
             font= font,
             connect_columns = connect_columns,
             translate_table_text = translate_table_text == 'する',

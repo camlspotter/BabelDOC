@@ -232,11 +232,16 @@ def create_parser():
         help="Force serif/sans-serif fonts",
     )
     translation_group.add_argument(
-        "--translation-prompt",
+        "--lang-out-nl",
         type=str,
         default=None,
-        metavar='PROMPT',
-        help="Translation prompt for LLM. Ex. 'Translate English to very polite Japanese.'",
+        help="Output language explanation in natural language"
+    )
+    translation_group.add_argument(
+        "--lang-in-nl",
+        type=str,
+        default=None,
+        help="Input language explanation in natural language"
     )
     translation_group.add_argument(
         "--connect-columns",
@@ -412,7 +417,8 @@ async def main():
             skip_scanned_detection=args.skip_scanned_detection,
             ocr_workaround=args.ocr_workaround,
             force_serif=args.force_font,
-            translation_prompt=args.translation_prompt,
+            lang_in_nl=args.lang_in_nl,
+            lang_out_nl=args.lang_out_nl,
             connect_columns=args.connect_columns,
         )
 

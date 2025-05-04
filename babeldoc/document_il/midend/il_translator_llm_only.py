@@ -144,6 +144,9 @@ class ILTranslatorLLMOnly:
         translation_config: TranslationConfig,
         tokenizer=None,
     ):
+        self.log_oc = open('llm_input_output.log', 'w', encoding='utf-8')
+        self.log_prompt = False
+
         self.translate_engine = translate_engine
         self.translation_config = translation_config
         self.font_mapper = FontMapper(translation_config)
@@ -240,6 +243,8 @@ class ILTranslatorLLMOnly:
             logger.debug(f"save translate tracking to {path}")
             with Path(path).open("w", encoding="utf-8") as f:
                 f.write(tracker.to_json())
+        
+        self.log_oc.close()
 
     def process_page(
         self,
@@ -374,51 +379,62 @@ class ILTranslatorLLMOnly:
                 llm_input.append(
                     f"The most similar title in the full text: {local_title_paragraph.unicode}"
                 )
-            # Create a structured prompt template for LLM translation
-            translation_prompt = ""
-            if self.translation_config.translation_prompt:
-                translation_prompt = f'各 JSON エントリに対して、 "input" フィールドのテキストの{self.translation_config.translation_prompt}'
-            else:
-                translation_prompt = f'各 JSON エントリに対して、 "input" フィールドのテキストの{self.translation_config.lang_in}を{self.translation_config.lang_out}に翻訳してください。'
 
-            prompt_template = (
-                f"""
-    You will be given a JSON formatted input containing entries with "id" and "input" fields. Here is the input:
-    
-    ```json
-    {json_format_input}
-    ```
-    
-    各 JSON エントリに対して、 "input" フィールドのテキストの{translation_prompt}
+            lang_in = self.translation_config.lang_in
+            if self.translation_config.lang_in_nl:
+                lang_in = self.translation_config.lang_in_nl
+            lang_out = self.translation_config.lang_out
+            if self.translation_config.lang_out_nl:
+                lang_out = self.translation_config.lang_out_nl
+            
+            llm_input.append(f'''
+`id` と `input` のフィールドを持つレコードのリストを翻訳し、翻訳結果を `id` と `output` のフィールドを持つレコードリストにしてください。
 
-    翻訳結果は "output" フィールドに入れ、 "id" フィールドとのレコードを作ってください。
-    
-    """
+入力データ例です:
 
-                + """
-    Here is an example of the expected format:
-    
-    <example>
-    ```json
-    Input:
-    {
+<example>
+```json
+[
+    {{
         "id": 1,
-        "input": "It was sunny yesterday.",
-    }
-    ```
-    Output:
-    ```json
-    {
+        "input": <{lang_in}のテキスト1>,
+    }},
+    {{
+        "id": 2,
+        "input": <{lang_in}のテキスト2>,
+    }},
+    ...
+]
+```
+</example>
+
+出力データ例です:
+
+<example>
+```json
+[
+    {{
         "id": 1,
-        "output": "translation"
-    }
-    ```
-    </example>
-    
-    Please return the translated json directly without wrapping ```json``` tag or include any additional information.
-    """
-            )
-            llm_input.append(prompt_template)
+        "output": <テキスト1の{lang_out}への翻訳>,
+    }},
+    {{
+        "id": 2,
+        "output": <テキスト2の{lang_out}への翻訳>,
+    }},
+    ...
+]
+```
+</example>
+
+- {lang_in}を{lang_out}に翻訳してください。
+- すでに{lang_out}の部分は{lang_in}に翻訳しては**いけません**。{lang_out}のままにしてください。
+''')
+
+            if not self.log_prompt:
+                self.log_prompt = True
+                self.log_oc.write('\n\n'.join(llm_input))
+
+            llm_input.append(json_format_input)
 
             final_input = "\n".join(llm_input).strip()
 
@@ -427,13 +443,6 @@ class ILTranslatorLLMOnly:
                 rate_limit_params={"paragraph_token_count": paragraph_token_count},
             )
             llm_output = llm_output.strip()
-
-            with open('llm_input_output.log', 'a', encoding='utf-8') as oc:
-                oc.write('INPUT+OUTPUT\n')
-                oc.write(final_input)
-                oc.write('\n')
-                oc.write(llm_output)
-                oc.write('\n\n')
 
             llm_output = self._clean_json_output(llm_output)
 
@@ -446,6 +455,16 @@ class ILTranslatorLLMOnly:
                 parsed_output = [parsed_output_]
             else:
                 parsed_output = parsed_output_
+
+            # Logging
+            log = []
+            for id_, input in enumerate(tweaked):
+                 input_str = ' '.join([s for (_,s) in input[0]])
+                 if d := next((d for d in parsed_output if d.get('id', None) == id_), None):
+                    log.append({ "id":id_, "input":input_str, "output":d['output'] })
+            self.log_oc.write('\n\n')
+            self.log_oc.write(json.dumps(log, indent=2, ensure_ascii=False))
+            self.log_oc.write('\n\n')
 
             try:
                 translation_results = {item["id"]: item["output"] for item in parsed_output}

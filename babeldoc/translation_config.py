@@ -36,11 +36,12 @@ class TranslationConfig:
         self,
         translator: BaseTranslator,
         input_file: str | Path,
-        lang_in: str,
-        lang_out: str,
+        lang_in: str, # en, jp
+        lang_out: str, # en, jp
         doc_layout_model: DocLayoutModel,
         force_serif: bool | None,  # Workaround for PyMuPDF which returns wrong serif information.
-        translation_prompt: str | None,
+        lang_in_nl: str | None,
+        lang_out_nl: str | None,
         connect_columns: bool,
         # for backward compatibility
         font: str | Path | None = None,
@@ -74,7 +75,8 @@ class TranslationConfig:
         ocr_workaround: bool = False,
     ):
         self.force_serif = force_serif
-        self.translation_prompt = translation_prompt
+        self.lang_in_nl = lang_in_nl
+        self.lang_out_nl = lang_out_nl
         self.connect_columns = connect_columns
 
         self.translator = translator
@@ -82,6 +84,8 @@ class TranslationConfig:
         self.input_file = input_file
         self.lang_in = lang_in
         self.lang_out = lang_out
+        self.lang_in_nl = lang_in_nl
+        self.lang_out_nl = lang_out_nl
         # just ignore font
         self.font = None
 
