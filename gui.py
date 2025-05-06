@@ -99,6 +99,7 @@ def spec_str(lang_in : Lang, lang_out : Lang, detail : str) -> str:
 with gr.Blocks() as demo:
     with gr.Row():
         with gr.Column(scale=0):
+            gr.Markdown('# PDF翻訳\n[使い方](https://demo01.rois-internal.local/babeldoc/)')
             file = gr.File(
                 file_count='single',
                 label='翻訳対象PDF',
