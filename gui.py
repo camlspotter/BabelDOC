@@ -224,6 +224,7 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--server-port', type= int, default= None)
+    parser.add_argument('--root-path', type= str, default= None)
     ns = parser.parse_args()
 
     # Queue() for parallel processing
@@ -234,7 +235,7 @@ def main():
         server_name= '0.0.0.0',
         server_port= ns.server_port,
         # favicon_path= icon.roischat16,
-        # root_path='/rois_llm'
+        root_path= ns.root_path,
     )
 
 if __name__ == "__main__":
