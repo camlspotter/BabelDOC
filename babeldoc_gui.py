@@ -15,6 +15,8 @@ import os
 
 from typing import Literal, get_args
 
+import usage
+
 Lang = Literal['英語', '日本語']
 langs = get_args(Lang)
 
@@ -162,7 +164,8 @@ with gr.Blocks() as demo:
         font,
         connect_columns,
         translate_table_text,
-        progress= gr.Progress()
+        request : gr.Request,
+        progress= gr.Progress(),
     ):
         config = build_config(
             input_file= file,
@@ -173,6 +176,7 @@ with gr.Blocks() as demo:
             connect_columns = connect_columns,
             translate_table_text = translate_table_text,
         )
+        usage.logger.info(f'{request.client.host} {file},{lang_in},{lang_out},{details},font={font},connect_columns={connect_columns},translate_table_text={translate_table_text}')
         progress(0.0, desc= 'Translating')
         async for event in async_translate(config):
             print(event)
