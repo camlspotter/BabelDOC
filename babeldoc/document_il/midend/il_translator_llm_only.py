@@ -428,6 +428,9 @@ class ILTranslatorLLMOnly:
 
 - {lang_in}を{lang_out}に翻訳してください。
 - すでに{lang_out}の部分は{lang_in}に翻訳しては**いけません**。{lang_out}のままにしてください。
+- 絶対に{lang_in}をそのまま返してはいけません。
+- 全ての{lang_in}が{lang_out}に翻訳されていることを確認してください。もし{lang_in}が残っている場合は、そのフィールドのみ、再度{lang_out}に翻訳してください。
+- 出力は元データ構造（JSON形式）を保ってください。
 ''')
 
             if not self.log_prompt:
@@ -519,7 +522,7 @@ class ILTranslatorLLMOnly:
                     #     continue
 
                     edit_distance = Levenshtein.distance(input_unicode, output_unicode)
-                    if edit_distance < 5 and input_token_count > 20:
+                    if edit_distance < 5:
                         logger.warning(
                             f"Translation result edit distance is too small. distance: {edit_distance}, input: {input_unicode}, output: {output_unicode}"
                         )
