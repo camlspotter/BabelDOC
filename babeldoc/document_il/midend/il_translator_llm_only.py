@@ -511,11 +511,12 @@ class ILTranslatorLLMOnly:
                     input_token_count = self.calc_token_count(input_unicode)
                     output_token_count = self.calc_token_count(output_unicode)
 
-                    if not (0.3 < output_token_count / input_token_count < 3):
-                        logger.warning(
-                            f"Translation result is too long or too short. Input: {input_token_count} for '{input_unicode}', Output: {output_token_count} for '{output_unicode}'"
-                        )
-                        continue
+                    # Token size of Japanese is usually much bigger than its English translaiton.
+                    # if not (0.3 < output_token_count / input_token_count < 3):
+                    #     logger.warning(
+                    #         f"Translation result is too long or too short. Input: {input_token_count} for '{input_unicode}', Output: {output_token_count} for '{output_unicode}'"
+                    #     )
+                    #     continue
 
                     edit_distance = Levenshtein.distance(input_unicode, output_unicode)
                     if edit_distance < 5 and input_token_count > 20:
