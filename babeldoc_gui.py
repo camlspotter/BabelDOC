@@ -191,7 +191,6 @@ with gr.Blocks() as demo:
         usage.logger.info(f'{request.client.host} {file},{lang_in},{lang_out},{details},font={font},connect_columns={connect_columns},translate_table_text={translate_table_text}')
         progress(0.0, desc= 'Translating')
         async for event in async_translate(config):
-            print(event)
             def report_progress(event):
                 if event.get('stage_total'):
                     progress(
