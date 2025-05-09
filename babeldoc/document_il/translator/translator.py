@@ -5,6 +5,7 @@ import time
 import unicodedata
 from abc import ABC
 from abc import abstractmethod
+import httpx
 
 import openai
 from tenacity import retry
@@ -252,6 +253,7 @@ class OpenAITranslator(BaseTranslator):
                     "content": text,
                 },
             ],
+            timeout= 30, # OpenAI API DOES time-out for weird request such as "translate to Klingon language".
         )
         self.update_token_count(response)
         return response.choices[0].message.content.strip()
