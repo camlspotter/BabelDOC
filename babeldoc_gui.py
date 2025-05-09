@@ -17,15 +17,25 @@ from typing import Literal, get_args
 
 import usage
 
-Lang = Literal['英語', '日本語']
+Lang = Literal['英語', '日本語', '中国語', '中国語(簡体字)', '中国語(繁体字)', '韓国語']
 langs = get_args(Lang)
 
-def lang_id(lang : Lang) -> str:
+def lang_id(lang : Lang|str) -> str:
     match lang:
         case '英語':
             return 'en'
         case '日本語':
             return 'jp'
+        case '中国語':
+            return 'ch'
+        case '中国語(簡体字)':
+            return 'ch'
+        case '中国語(繁体字)':
+            return 'tw'
+        case '韓国語':
+            return 'kr'
+        case _:
+            return 'xx'
 
 Font = Literal['なし', 'serif/明朝', 'sans-serif/ゴシック']
 fonts = list(get_args(Font))
@@ -113,11 +123,13 @@ with gr.Blocks() as demo:
                     langs,
                     label='翻訳元',
                     value=langs[0],
+                    allow_custom_value= True,
                 )
                 lang_out = gr.Dropdown(
                     langs,
                     label='翻訳先',
                     value=langs[1],
+                    allow_custom_value= True,
                 )
                 details = gr.Text(label='文体指定', placeholder='常体(だ、である)をつかった,簡潔な,礼儀正しい,等')
             font = gr.Radio(
