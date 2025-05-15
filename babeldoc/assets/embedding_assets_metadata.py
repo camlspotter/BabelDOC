@@ -85,7 +85,7 @@ EMBEDDING_FONT_METADATA = {
         "font_name": "BIZ UD Mincho Bold",
         "italic": 0,
         "monospace": 0,
-        "serif": 0,
+        "serif": 1,
         "sha3_256": "d8f0bd381b72a390a4a3f09d888f1fe098ff55c08ad34a14a7e6fd9f4779afb5",
         "size": 6789924,
     },
