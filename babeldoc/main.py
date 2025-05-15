@@ -223,7 +223,7 @@ def create_parser():
         elif v == 'serif':
             return True
         else:
-            raise argparse.ArgumentTypeError(f'--force-serif only takes sans-serif or serif')
+            raise argparse.ArgumentTypeError(f'--force-font only takes sans-serif or serif')
     translation_group.add_argument(
         "--force-font",
         type=font_type_to_bool,
