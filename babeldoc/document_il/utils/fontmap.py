@@ -112,13 +112,18 @@ class FontMapper:
                 continue
             if bool(bold) != bool(font.is_bold):
                 continue
-            if bool(serif) != bool(font.is_serif):
+            def is_font_serif(font):
+                id = font.font_id.lower()
+                if re.search(r'mincho|serif', id):
+                    return True
+                else:
+                    return False 
+            font_serif = is_font_serif(font)
+            # 不知道什么原因，思源黑体的 serif 属性为 1，先 workaround
+            if bool(serif) and not font_serif:
                 continue
-            # # 不知道什么原因，思源黑体的 serif 属性为 1，先 workaround
-            # if bool(serif) and "serif" not in font.font_id.lower():
-            #     continue
-            # if not bool(serif) and "serif" in font.font_id.lower():
-            #     continue
+            if not bool(serif) and font_serif:
+                continue
             return font
 
         return None
