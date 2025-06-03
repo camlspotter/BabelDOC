@@ -165,8 +165,13 @@ async def get_fastest_upstream_for_font(
     return None, None
 
 
+# XXX This requires both the fonts and the modles exist at each upstream,
+# which is not the case for my repo of fonts.
+# async def get_fastest_upstream_for_model(client: httpx.AsyncClient | None = None):
+#     return await get_fastest_upstream_for_font(client, exclude_upstream=["github"])
+
 async def get_fastest_upstream_for_model(client: httpx.AsyncClient | None = None):
-    return await get_fastest_upstream_for_font(client, exclude_upstream=["github"])
+    return "huggingface", None
 
 
 async def get_fastest_upstream(client: httpx.AsyncClient | None = None):

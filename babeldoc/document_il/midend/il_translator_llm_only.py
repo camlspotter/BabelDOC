@@ -125,14 +125,16 @@ def untweak_translation(
             for (pos, (id, s)) in enumerate(xs):
                 if pos == len(xs) - 1:
                     l = len(translation)
+                    add_translation(id, translation)
+                    translation = ''
                 else:
                     l = int(translation_len * len(s) / total_len)
-                if l == 0:
-                    # Weird...
-                    pass
-                else:
-                    add_translation(id, translation[:l])
-                    translation = translation[l:]
+                    if l == 0:
+                        # Weird...
+                        pass
+                    else:
+                        add_translation(id, translation[:l] + '///')
+                        translation = translation[l:]
     return translation_results2
 
 class ILTranslatorLLMOnly:
