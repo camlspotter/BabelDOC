@@ -1,0 +1,17 @@
+# /etc/systemd/system/babeldoc.service
+[Unit]
+Description=BabelDOC
+After=network.target
+
+[Service]
+Type=simple
+User=jun
+WorkingDirectory=/home/jun/BabelDOC
+ExecStart=/home/jun/.local/bin/uv run babeldoc_gui.py --server-port 5006 --root-path /babeldoc
+Restart=always
+RestartSec=5
+StandardOutput=append:/home/jun/BabelDOC/babeldoc_stdout.log
+StandardError=append:/home/jun/BabelDOC/babeldoc_stderr.log
+
+[Install]
+WantedBy=multi-user.target
